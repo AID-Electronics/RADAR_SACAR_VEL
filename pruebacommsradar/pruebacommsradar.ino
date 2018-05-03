@@ -5,8 +5,12 @@
 #define TARGET_MAX_COUNT 100
 #define IN_AIR_MAX_TARGETS 20
 
+#define MAX_VEL 100
+
+
 //Velocidad a la que deberá girar la plataforma
-int VEL_GIRO;
+float VEL_GIRO;
+float VEL_EN_VOLTIOS; // LA velocidad se enviará al variador mediante una tension de 0 a 10 voltios
 
 
 //Union para poder convertir bytes en floats
@@ -92,25 +96,11 @@ void loop()
 
     IPAddress remote = Udp.remoteIP();//Obtenemos la ID del RADAR
 
-  //  printIP(remote); //SACCAMOS LA IP OBTENIDA
-
-    //Serial.print("El puerto es: ");
-    //Serial.println(Udp.remotePort());
-    
+  
     cleanBuffer(packetBuffer); //VACIAMOS A CAD DE CARACTERES
     
     Udp.read(packetBuffer,packetSize); //Según la libreria 
-/*
-    Serial.println(" ");
-    for(int j=0;j<packetSize;j++)
-    {
-        Serial.print(packetBuffer[j],HEX);
-        Serial.print(" ");
-      
-    }
 
-    Serial.println(" ");//
-*/
     
     if (!flag)      //La Primera vez que entramos en el LOOP guardamos el valor de la ID del mensaje para comprobar mas adelante errores
     {
@@ -132,8 +122,6 @@ void loop()
       Aux++;
 
       closest_target=ordenarDistancia(ObjetivosTiempoReal, Count_Target_tiempoReal); //closest_target se referirá al objetivo mas cercano que se mueva en dirección al radar
-    //  Serial.println("HEmos ordenado los objetivos en funcion de la distancia ");
-      //Serial.println(" ");
       
       VEL_GIRO=closest_target.velocidad;    //ASIGNAMOS LA VELOCIDAD A UNA VARIABLE
 
@@ -165,6 +153,7 @@ void loop()
      
     
    }
+VEL_EN_VOLTIOS= map(VEL_GIRO,0,MAX_VEL,0,10);
 
    
     
